@@ -1,16 +1,22 @@
 package core
 
 import (
+	"crucigrama/stopwords"
 	"errors"
 	"strings"
 	"unicode"
 
 	textrank "github.com/DavidBelicza/TextRank/v2"
+	"golang.org/x/text/runes"
+	"golang.org/x/text/transform"
+	"golang.org/x/text/unicode/norm"
 )
 
 func MostImportantWords(text string, wordCount int, maxSize int) ([]string, error) {
 	tr := textrank.NewTextRank()
 	lang := textrank.NewDefaultLanguage()
+	lang.SetActiveLanguage("es")
+	lang.SetWords("es", stopwords.Spanish)
 	algo := textrank.NewChainAlgorithm()
 	rule := textrank.NewDefaultRule()
 	tr.Populate(text, lang, rule)
@@ -29,6 +35,7 @@ func MostImportantWords(text string, wordCount int, maxSize int) ([]string, erro
 		if len(word) > maxSize {
 			continue
 		}
+		word = Normalize(word)
 		importantWords = append(importantWords, strings.ToUpper((word)))
 		if len(importantWords) == wordCount {
 			break
@@ -59,4 +66,10 @@ func ToAlpha(text string) string {
 		}
 	}
 	return string(result)
+}
+
+func Normalize(text string) string {
+	t := transform.Chain(norm.NFD, runes.Remove(runes.In(unicode.Mn)), norm.NFC)
+	result, _, _ := transform.String(t, text)
+	return result
 }

@@ -2,6 +2,7 @@ package tui
 
 import (
 	"crucigrama/wikipedia"
+	"errors"
 
 	"github.com/charmbracelet/bubbles/list"
 	"github.com/charmbracelet/bubbles/spinner"
@@ -51,6 +52,11 @@ func (m optionsScreenModel) onOptionsFetched(items []wikipedia.OpenSearchOption)
 // Lifecycle methods
 // *****************************************************************************
 func (m optionsScreenModel) Init() tea.Cmd {
+	if m.topic == "" {
+		return func() tea.Msg {
+			return errors.New("no se ha especificado un tema")
+		}
+	}
 	return tea.Batch(m.spinner.Tick, fetchOptions(m.topic))
 }
 
@@ -60,15 +66,21 @@ func (m optionsScreenModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
 		switch msg.String() {
-		case "ctrl+c", "esc":
+		case "ctrl+c":
 			return m, tea.Quit
+		case "esc":
+			if !m.list.SettingFilter() && !m.list.IsFiltered() {
+				return m, tea.Quit
+			}
 		case "enter":
 			item, ok := m.list.SelectedItem().(listItem)
 			if !ok {
 				return m, tea.Quit
 			}
-			title := item.Title()
-			return RootScreen().SwitchScreen(CrosswordScreen(title))
+			if !m.list.SettingFilter() {
+				title := item.Title()
+				return RootScreen().SwitchScreen(CrosswordScreen(title))
+			}
 		}
 	case spinner.TickMsg:
 		if m.loading {

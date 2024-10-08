@@ -25,7 +25,7 @@ type QueryExtractResponse struct {
 func OpenSearch(topic string) ([]OpenSearchOption, error) {
 	// Get request and error handling
 	topicQuery := url.QueryEscape(topic)
-	path := "https://en.wikipedia.org/w/api.php?action=opensearch&format=json&search=" + topicQuery
+	path := "https://es.wikipedia.org/w/api.php?action=opensearch&format=json&search=" + topicQuery
 	res, err := http.Get(path)
 	if err != nil {
 		return nil, err
@@ -67,7 +67,7 @@ func OpenSearch(topic string) ([]OpenSearchOption, error) {
 func QueryExtract(title string) (string, error) {
 	// Get request and error handling
 	titleQuery := url.QueryEscape(title)
-	path := "https://en.wikipedia.org/w/api.php?action=query&redirects=5&prop=extracts&exintro&explaintext&format=json&titles=" + titleQuery
+	path := "https://es.wikipedia.org/w/api.php?action=query&redirects=5&prop=extracts&exintro&explaintext&format=json&titles=" + titleQuery
 	res, err := http.Get(path)
 	if err != nil {
 		return "", err

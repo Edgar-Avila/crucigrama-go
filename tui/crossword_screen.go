@@ -16,15 +16,22 @@ import (
 // *****************************************************************************
 var crosswordStyle = lipgloss.
 	NewStyle().
-	Foreground(colorPrimary).
+	Foreground(colorWhite).
 	Border(lipgloss.RoundedBorder()).
+	BorderForeground(colorPrimary).
 	PaddingLeft(1).
 	PaddingRight(1).
 	MarginTop(1).
 	MarginBottom(1).
 	MarginLeft(2)
 
-var crosswordWordsStyle = lipgloss.NewStyle().Foreground(colorGray).MarginTop(2)
+var crosswordWordsStyle = lipgloss.NewStyle().
+	Foreground(colorGray).
+	Border(lipgloss.RoundedBorder()).
+	BorderForeground(colorWhite).
+	MarginTop(2).
+	PaddingLeft(1).
+	PaddingRight(1)
 
 // *****************************************************************************
 // Model
@@ -129,7 +136,7 @@ func (m crosswordScreenModel) View() string {
 		titleRendered := titleStyle.Render(m.title)
 		helpRendered := helpStyle.Render("(Presiona Esc para salir)")
 		crosswordRendered := crosswordStyle.Render(crosswordStr)
-		wordsRendered := crosswordWordsStyle.Render(wordsStr)
+		wordsRendered := crosswordWordsStyle.Height(m.size).Render(wordsStr)
 		// Join with crossword
 		renderedCrossword := lipgloss.JoinVertical(
 			lipgloss.Top,
