@@ -2,6 +2,9 @@
 TUI de crucigrama en Golang consumiendo la API de Wikipedia para el curso de Programación Para Competición Avanzado
 
 ## Capturas de pantalla
+### Proceso (GIF)
+![crucigrama](https://github.com/user-attachments/assets/33439f16-fd31-4410-8ece-fd5861f7ec74)
+
 ### Llamada a la app
 ![image](https://github.com/user-attachments/assets/880ba651-66f3-49ad-a645-5292d7f2c850)
 
