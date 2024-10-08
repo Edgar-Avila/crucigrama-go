@@ -1,30 +1,39 @@
 /*
 Copyright © 2024 NAME HERE <EMAIL ADDRESS>
-
 */
 package cmd
 
 import (
+	"crucigrama/tui"
+	"fmt"
 	"os"
 
+	tea "github.com/charmbracelet/bubbletea"
 	"github.com/spf13/cobra"
 )
-
-
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
 	Use:   "crucigrama",
-	Short: "A brief description of your application",
-	Long: `A longer description that spans multiple lines and likely contains
-examples and usage of using your application. For example:
+	Short: "Un crucigrama en la terminal",
+	Long:  `Selecciona un tema y resuelve un crucigrama en la terminal.`,
+	Run: func(cmd *cobra.Command, args []string) {
+		// Parse flags
+		topicVal, _ := cmd.Flags().GetString("tema")
+		// wordCount, _ := cmd.Flags().GetInt("palabras")
+		// size, _ := cmd.Flags().GetInt("lado")
 
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
-	// Uncomment the following line if your bare application
-	// has an action associated with it:
-	// Run: func(cmd *cobra.Command, args []string) { },
+		model := tui.RootScreen()
+		if topicVal != "" {
+			model = tui.RootScreenWithModel(tui.OptionsScreen(topicVal))
+		}
+		p := tea.NewProgram(model, tea.WithAltScreen())
+		_, err := p.Run()
+		if err != nil {
+			fmt.Println("Error al empezar el programa:", err)
+			os.Exit(1)
+		}
+	},
 }
 
 // Execute adds all child commands to the root command and sets flags appropriately.
@@ -37,15 +46,7 @@ func Execute() {
 }
 
 func init() {
-	// Here you will define your flags and configuration settings.
-	// Cobra supports persistent flags, which, if defined here,
-	// will be global for your application.
-
-	// rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.crucigrama.yaml)")
-
-	// Cobra also supports local flags, which will only run
-	// when this action is called directly.
-	rootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+	rootCmd.Flags().StringP("tema", "t", "", "El tema del crucigrama")
+	rootCmd.Flags().IntP("palabras", "p", 10, "Cantidad de palabras a poner en el crucigrama")
+	rootCmd.Flags().IntP("lado", "l", 20, "Tamaño del lado del crucigrama")
 }
-
-
