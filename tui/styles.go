@@ -6,6 +6,7 @@ var colorPrimary = lipgloss.Color("#5f5fd7")
 var colorBlack = lipgloss.Color("#000000")
 var colorWhite = lipgloss.Color("#ffffff")
 var colorGray = lipgloss.Color("#666666")
+var colorRed = lipgloss.Color("#ff0000")
 
 var containerStyle = lipgloss.NewStyle().
 	Padding(2).
@@ -22,3 +23,5 @@ var helpStyle = lipgloss.NewStyle().
 var spinnerStyle = lipgloss.NewStyle().
 	Foreground(colorPrimary)
 
+var errorStyle = lipgloss.NewStyle().
+	Foreground(colorRed)

@@ -87,7 +87,7 @@ func Crossword(words []string, size int) ([][]string, error) {
 	}
 
 	if placedCount < len(words) {
-		return nil, errors.New("no se pudieron colocar todas las palabras en el crucigrama")
+		return nil, errors.New("no se pudieron colocar todas las palabras en el crucigrama, prueba con menos palabras o un tamaño mayor")
 	}
 
 	// Fill the empty cells with random letters

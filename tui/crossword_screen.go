@@ -3,7 +3,6 @@ package tui
 import (
 	"crucigrama/core"
 	"crucigrama/wikipedia"
-	"errors"
 	"strings"
 
 	"github.com/charmbracelet/bubbles/spinner"
@@ -44,9 +43,10 @@ type crosswordScreenModel struct {
 	size      int
 	wordCount int
 	title     string
+	error     error
 }
 
-func CrosswordScreen(title string) crosswordScreenModel {
+func CrosswordScreen(title string, size int, wordCount int) crosswordScreenModel {
 	s := spinner.New()
 	s.Spinner = spinner.Dot
 	s.Style = spinnerStyle
@@ -55,8 +55,8 @@ func CrosswordScreen(title string) crosswordScreenModel {
 		spinner:   s,
 		loading:   true,
 		title:     title,
-		size:      20,
-		wordCount: 10,
+		size:      size,
+		wordCount: wordCount,
 	}
 }
 
@@ -82,16 +82,6 @@ func (m crosswordScreenModel) onCrosswordFetched(crossword [][]string) (tea.Mode
 // Lifecycle methods
 // *****************************************************************************
 func (m crosswordScreenModel) Init() tea.Cmd {
-	if m.size < 10 {
-		return func() tea.Msg {
-			return errors.New("el tamaño del crucigrama debe ser mayor o igual a 10")
-		}
-	}
-	if m.wordCount < 2 {
-		return func() tea.Msg {
-			return errors.New("la cantidad de palabras debe ser mayor o igual a 2")
-		}
-	}
 	return tea.Batch(m.spinner.Tick, getExtract(m.title))
 }
 
@@ -117,6 +107,10 @@ func (m crosswordScreenModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		return m.onWordsFetched(msg)
 	case crosswordMsg:
 		return m.onCrosswordFetched(msg)
+	case error:
+		m.loading = false
+		m.error = msg
+		return m, nil
 	}
 
 	return m, cmd
@@ -126,6 +120,12 @@ func (m crosswordScreenModel) View() string {
 	view := ""
 	if m.loading {
 		view = spinnerStyle.Render(m.spinner.View() + " Generando crucigrama...")
+	} else if m.error != nil {
+		view = lipgloss.JoinVertical(
+			lipgloss.Top,
+			errorStyle.Render(m.error.Error()),
+			helpStyle.Render("(Presiona Esc para salir)"),
+		)
 	} else {
 		lines := make([]string, len(m.crossword))
 		for i, row := range m.crossword {
@@ -133,7 +133,7 @@ func (m crosswordScreenModel) View() string {
 		}
 		crosswordStr := strings.Join(lines, "\n")
 		wordsStr := strings.Join(m.words, "\n")
-		titleRendered := titleStyle.Render(m.title)
+		titleRendered := titleStyle.PaddingLeft(1).PaddingRight(1).Render(m.title)
 		helpRendered := helpStyle.Render("(Presiona Esc para salir)")
 		crosswordRendered := crosswordStyle.Render(crosswordStr)
 		wordsRendered := crosswordWordsStyle.Height(m.size).Render(wordsStr)

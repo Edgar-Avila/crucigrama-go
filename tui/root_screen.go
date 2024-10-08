@@ -5,8 +5,10 @@ import (
 )
 
 type RootScreenModel struct {
-	model tea.Model
-	Err   error
+	model        tea.Model
+	screenWidth  int
+	screenHeight int
+	Err          error
 }
 
 func RootScreen() RootScreenModel {
@@ -15,7 +17,7 @@ func RootScreen() RootScreenModel {
 	rootModel = TopicScreen()
 
 	return RootScreenModel{
-		model: rootModel,
+		model:        rootModel,
 	}
 }
 
@@ -25,7 +27,6 @@ func RootScreenWithModel(model tea.Model) RootScreenModel {
 	}
 }
 
-
 func (m RootScreenModel) Init() tea.Cmd {
 	return m.model.Init()
 }
@@ -33,7 +34,9 @@ func (m RootScreenModel) Init() tea.Cmd {
 func (m RootScreenModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.WindowSizeMsg:
-		containerStyle = containerStyle.Width(msg.Width - 2).Height(msg.Height - 2)
+		m.screenWidth = msg.Width
+		m.screenHeight = msg.Height
+		containerStyle = containerStyle.Width(m.screenWidth - 2).Height(m.screenHeight - 2)
 	case error:
 		m.Err = msg
 		return m.model, tea.Quit

@@ -13,10 +13,10 @@ import (
 // Model
 // *****************************************************************************
 type optionsScreenModel struct {
-	loading bool
-	spinner spinner.Model
-	list    list.Model
-	topic   string
+	loading   bool
+	spinner   spinner.Model
+	list      list.Model
+	topic     string
 }
 
 func OptionsScreen(topic string) optionsScreenModel {
@@ -25,10 +25,10 @@ func OptionsScreen(topic string) optionsScreenModel {
 	s.Style = spinnerStyle
 
 	return optionsScreenModel{
-		spinner: s,
-		loading: true,
-		list:    list.New(nil, list.NewDefaultDelegate(), 0, 0),
-		topic:   topic,
+		spinner:   s,
+		loading:   true,
+		list:      list.New(nil, list.NewDefaultDelegate(), 0, 0),
+		topic:     topic,
 	}
 }
 
@@ -79,7 +79,7 @@ func (m optionsScreenModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			}
 			if !m.list.SettingFilter() {
 				title := item.Title()
-				return RootScreen().SwitchScreen(CrosswordScreen(title))
+				return RootScreen().SwitchScreen(sizeScreen(title))
 			}
 		}
 	case spinner.TickMsg:
