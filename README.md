@@ -1,9 +1,10 @@
 # Crucigrama en Golang
-TUI de crucigrama en Golang consumiendo la API de Wikipedia para el curso de Programación Para Competición Avanzado
+TUI de crucigrama en Golang consumiendo la API de Wikipedia para el curso de Programación Para Competición Avanzado.
+Incluye el efecto matrix para el crucigrama.
 
 ## Capturas de pantalla
 ### Proceso (GIF)
-![crucigrama-size](https://github.com/user-attachments/assets/2234adba-3ae8-484f-a99d-fde2d08d1b8f)
+![crucigrama](https://github.com/user-attachments/assets/fc427122-4204-4421-8223-3733d7f0bb9b)
 
 ### Llamada a la app
 ![image](https://github.com/user-attachments/assets/880ba651-66f3-49ad-a645-5292d7f2c850)
@@ -22,3 +23,20 @@ TUI de crucigrama en Golang consumiendo la API de Wikipedia para el curso de Pro
 
 ### Crucigrama generado
 ![image](https://github.com/user-attachments/assets/73b449f2-1e69-40e0-bb68-adfd97278bd7)
+
+### Efecto matrix generado
+![image](https://github.com/user-attachments/assets/69de990d-4370-47c3-b46b-3cc20c458085)
+
+## Modo de Uso
+- Ingresa cualquier tema
+- El programa buscará articulos relacionados en Wikipedia
+- Filtra y escoge un artículo
+- Ingresa el tamaño del crucigrama y la cantidad de palabras que se usarán
+- El sistema generará un crucigrama con ese artículo y lo mostrará
+- Presiona `m` para ver un efecto matrix con las letras del crucigrama
+
+## Módulos
+- `core`: Los algoritmos para generar el crucigrama y la matriz
+- `tui`: Interfaz de la aplicación
+- `stopwords`: Lista de stopwords a quitar de los artículos
+- `wikipedia`: Funciones para hacer llamadas a la API de wikipedia
