@@ -7,6 +7,7 @@ var colorBlack = lipgloss.Color("#000000")
 var colorWhite = lipgloss.Color("#ffffff")
 var colorGray = lipgloss.Color("#666666")
 var colorRed = lipgloss.Color("#ff0000")
+var colorGreen = lipgloss.Color("#00ff00")
 
 var containerStyle = lipgloss.NewStyle().
 	Padding(2).

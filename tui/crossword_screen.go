@@ -155,7 +155,7 @@ func (m crosswordScreenModel) View() string {
 				lines[i] = strings.Join(row, " ")
 			}
 			matrixStr := strings.Join(lines, "\n")
-			renderedContent = crosswordStyle.Render(matrixStr)
+			renderedContent = crosswordStyle.Foreground(colorGreen).Render(matrixStr)
 		} else {
 			lines := make([]string, len(m.crossword))
 			for i, row := range m.crossword {
@@ -227,7 +227,7 @@ func getCrossword(words []string, size int) tea.Cmd {
 type matrixEffectMsg struct{}
 
 func tickMatrix() tea.Cmd {
-	return tea.Tick(250 * time.Millisecond, func(time.Time) tea.Msg {
+	return tea.Tick(50*time.Millisecond, func(time.Time) tea.Msg {
 		return matrixEffectMsg{}
 	})
 }
