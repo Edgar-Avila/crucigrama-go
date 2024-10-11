@@ -4,6 +4,7 @@ import (
 	"crucigrama/core"
 	"crucigrama/wikipedia"
 	"strings"
+	"time"
 
 	"github.com/charmbracelet/bubbles/spinner"
 	tea "github.com/charmbracelet/bubbletea"
@@ -36,14 +37,16 @@ var crosswordWordsStyle = lipgloss.NewStyle().
 // Model
 // *****************************************************************************
 type crosswordScreenModel struct {
-	loading   bool
-	spinner   spinner.Model
-	crossword [][]string
-	words     []string
-	size      int
-	wordCount int
-	title     string
-	error     error
+	loading       bool
+	spinner       spinner.Model
+	crossword     [][]string
+	matrix        [][]string
+	words         []string
+	size          int
+	wordCount     int
+	title         string
+	showingMatrix bool
+	error         error
 }
 
 func CrosswordScreen(title string, size int, wordCount int) crosswordScreenModel {
@@ -54,6 +57,7 @@ func CrosswordScreen(title string, size int, wordCount int) crosswordScreenModel
 	return crosswordScreenModel{
 		spinner:   s,
 		loading:   true,
+		matrix:    nil,
 		title:     title,
 		size:      size,
 		wordCount: wordCount,
@@ -93,9 +97,21 @@ func (m crosswordScreenModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		switch msg.String() {
 		case "ctrl+c", "esc", "q":
 			return m, tea.Quit
-		case "enter":
+		case "m":
+			m.showingMatrix = !m.showingMatrix
+			if m.showingMatrix {
+				m.matrix = core.MatrixEffectInit(m.crossword)
+				return m, tickMatrix()
+			}
 			return m, nil
 		}
+	case matrixEffectMsg:
+		m.matrix = core.MatrixEffectNext(m.matrix)
+		if !m.showingMatrix {
+			return m, nil
+		}
+		return m, tickMatrix()
+
 	case spinner.TickMsg:
 		if m.loading {
 			m.spinner, cmd = m.spinner.Update(msg)
@@ -127,28 +143,41 @@ func (m crosswordScreenModel) View() string {
 			helpStyle.Render("(Presiona Esc para salir)"),
 		)
 	} else {
-		lines := make([]string, len(m.crossword))
-		for i, row := range m.crossword {
-			lines[i] = strings.Join(row, " ")
-		}
-		crosswordStr := strings.Join(lines, "\n")
 		wordsStr := strings.Join(m.words, "\n")
 		titleRendered := titleStyle.PaddingLeft(1).PaddingRight(1).Render(m.title)
 		helpRendered := helpStyle.Render("(Presiona Esc para salir)")
-		crosswordRendered := crosswordStyle.Render(crosswordStr)
-		wordsRendered := crosswordWordsStyle.Height(m.size).Render(wordsStr)
+		helpMatrixRendered := helpStyle.Render("(Presiona m para efecto matrix)")
+		renderedSide := crosswordWordsStyle.Height(m.size).Render(wordsStr)
+		renderedContent := ""
+		if m.showingMatrix {
+			lines := make([]string, len(m.matrix))
+			for i, row := range m.matrix {
+				lines[i] = strings.Join(row, " ")
+			}
+			matrixStr := strings.Join(lines, "\n")
+			renderedContent = crosswordStyle.Render(matrixStr)
+		} else {
+			lines := make([]string, len(m.crossword))
+			for i, row := range m.crossword {
+				lines[i] = strings.Join(row, " ")
+			}
+			crosswordStr := strings.Join(lines, "\n")
+			renderedContent = crosswordStyle.Render(crosswordStr)
+		}
+
 		// Join with crossword
 		renderedCrossword := lipgloss.JoinVertical(
 			lipgloss.Top,
 			lipgloss.PlaceHorizontal(m.size*2+8, lipgloss.Center, titleRendered),
-			crosswordRendered,
+			renderedContent,
 			lipgloss.PlaceHorizontal(m.size*2+8, lipgloss.Center, helpRendered),
+			lipgloss.PlaceHorizontal(m.size*2+8, lipgloss.Center, helpMatrixRendered),
 		)
 
 		// Join with
 		view = lipgloss.JoinHorizontal(
 			lipgloss.Top,
-			wordsRendered,
+			renderedSide,
 			renderedCrossword,
 		)
 	}
@@ -193,4 +222,12 @@ func getCrossword(words []string, size int) tea.Cmd {
 		}
 		return crosswordMsg(crossword)
 	}
+}
+
+type matrixEffectMsg struct{}
+
+func tickMatrix() tea.Cmd {
+	return tea.Tick(250 * time.Millisecond, func(time.Time) tea.Msg {
+		return matrixEffectMsg{}
+	})
 }
